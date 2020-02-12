@@ -3,28 +3,28 @@
 #include <string.h>
 #include <stdint.h>
 
-#define PATH_L             255
-#define PATH_STRING_L      65280 
-#define NAME_L             255
-#define DATA_L             255
-#define MAX_SONS           1024
-#define DIR_T              'D'
-#define FILE_T             'F'
-#define CMD_L              20             
+#define LON_CHEMIN             255
+#define LON_NOM_CHEMIN      65280 
+#define LON_NOM             255
+#define LON_CONTENU             255
+#define MAX_FILS           1024
+#define TYPE_REP              'D'
+#define TYPE_FICH             'F'
+#define LON_CMD              20             
 
 typedef enum { OK, NO } result;
 typedef enum { true, false } boolean;
 
 struct result {
-	char p[PATH_STRING_L];
+	char p[LON_NOM_CHEMIN];
 	struct result * next;
 };
 
 typedef struct res {
 	char type;
-	char name[NAME_L];
-	//char path[PATH_STRING_L];
-	char data[DATA_L];
+	char name[LON_NOM];
+	//char path[LON_NOM_CHEMIN];
+	char data[LON_CONTENU];
 	struct res * son;
 	struct res * bro;
 	struct res * prev;
@@ -37,7 +37,7 @@ struct result * results;
 
 //####################################################################################
 
-node * create_element(node *T, node *F, char *name, char res_type) {
+node * creer_element(node *T, node *F, char *name, char res_type) {
 	int i, l;
 	T = (node *) malloc(sizeof(node));
 	if (T == NULL) {
@@ -60,14 +60,14 @@ node * create_element(node *T, node *F, char *name, char res_type) {
 
 //####################################################################################
 
-void extract_name(char * path, char * name) {
+void extraire_nom(char * path, char * name) {
 	int i, l;
 	l = (int) strlen(path);
 	i = l - 1;
 	while (path[i] != '/') {
 		i--;
 	}
-	if (strlen(path)-i > NAME_L)
+	if (strlen(path)-i > LON_NOM)
 		strcpy(name, "");
 	else
 		strcpy(name, &path[i+1]);
@@ -75,7 +75,7 @@ void extract_name(char * path, char * name) {
 
 //####################################################################################
 
-int calc_path_length(char * s) {
+int calc_lon_chemin(char * s) {
 	int i, k = 0;
 	for (i = 0; s[i] != '\0'; i++) {
 		if (s[i] == '/') {
@@ -87,11 +87,11 @@ int calc_path_length(char * s) {
 
 //####################################################################################
 
-node * path_travel(char * path) {
+node * positionner(char * path) {
 
 	node * t;
 	char * token;
-	char temp_path[PATH_STRING_L];
+	char temp_path[LON_NOM_CHEMIN];
 	int i = 0;
 	boolean found = false;
 
@@ -131,13 +131,13 @@ node * path_travel(char * path) {
 
 //####################################################################################
 
-result create(char * name, char * path, int path_length, char res_type) {
+result creer(char * name, char * path, int path_length, char res_type) {
 
 	node * t;
 	node * new;
 	node * f;
 	char * token;
-	char temp_path[PATH_STRING_L];
+	char temp_path[LON_NOM_CHEMIN];
 	int i = 0;
 	boolean found = false;
 	boolean free_slot = false;
@@ -169,23 +169,23 @@ result create(char * name, char * path, int path_length, char res_type) {
 		if (found == false)   { // chemin invalide, j'essaye de créer un nœud sous un autre inexistant
 			return NO;
 		}
-		else if (found == true && t->type == FILE_T)
+		else if (found == true && t->type == TYPE_FICH)
 			return NO;
 
 		token = strtok(NULL, "/");
 		i++;
 	}
 
-	if (t->sonsnum == MAX_SONS) {
+	if (t->sonsnum == MAX_FILS) {
 		return NO;
 	}
 
 	if (t->son == NULL) {
 		f = t;
 		f->sonsnum++;
-		new = create_element(t, f, name, res_type);
+		new = creer_element(t, f, name, res_type);
 		t->son = new;
-		new->prev = NULL; // déjà fait dans le create_element
+		new->prev = NULL; // déjà fait dans le creer_element
 		return OK;
 	}
 
@@ -202,7 +202,7 @@ result create(char * name, char * path, int path_length, char res_type) {
 	}
 
 	f->sonsnum++;
-	new = create_element(t, f, name, res_type);
+	new = creer_element(t, f, name, res_type);
 	t->bro = new;
 	new->prev = t;
 	new->father = f;
@@ -211,18 +211,18 @@ result create(char * name, char * path, int path_length, char res_type) {
 
 //####################################################################################
 
-result read_file(char * path, char * name, char * contenuto) {
+result lire(char * path, char * name, char * contenu) {
 
 	node * t;
 
-	t = path_travel(path);
+	t = positionner(path);
 
 	if (t == NULL) {
 		return NO;
 	}
 
-	if (strcmp(t->name, name) == 0 && t->type == FILE_T) {
-		strcpy(contenuto, t->data);
+	if (strcmp(t->name, name) == 0 && t->type == TYPE_FICH) {
+		strcpy(contenu, t->data);
 		return OK;
 	}
 
@@ -232,19 +232,19 @@ result read_file(char * path, char * name, char * contenuto) {
 
 //####################################################################################
 
-int write_file(char * path, char * name, char * contenuto) {
+int ecrire(char * path, char * name, char * contenu) {
 
 	node * t;
 
-	t = path_travel(path);
+	t = positionner(path);
 
 	if (t == NULL) {
 		return -1;
 	}
 
-	if (strcmp(t->name, name) == 0 && t->type == FILE_T) {
-		contenuto[strlen(contenuto)-1] = '\0';
-		strcpy(t->data, contenuto);                    
+	if (strcmp(t->name, name) == 0 && t->type == TYPE_FICH) {
+		contenu[strlen(contenu)-1] = '\0';
+		strcpy(t->data, contenu);                    
 		return (int) strlen(t->data);
 	}
 
@@ -254,17 +254,17 @@ int write_file(char * path, char * name, char * contenuto) {
 
 //####################################################################################
 
-result delete(char * path, char * name) {
+result supprimer(char * path, char * name) {
 
 		node * t;
 
-		t = path_travel(path);
+		t = positionner(path);
 		
 		if (t == NULL) {
 			return NO;
 		}
 		
-		if (t->type == DIR_T && t->sonsnum != 0) {
+		if (t->type == TYPE_REP && t->sonsnum != 0) {
 			return NO;
 		}
 		
@@ -302,13 +302,13 @@ result delete(char * path, char * name) {
 
 //####################################################################################
 
-int delete_r(node * R, int del_num) {
+int supprimer_rec(node * R, int del_num) {
 
 	if (R->son != NULL)
-		del_num = del_num + delete_r(R->son, del_num);
+		del_num = del_num + supprimer_rec(R->son, del_num);
 
 	if (R->bro != NULL)
-		del_num = del_num + delete_r(R->bro, del_num);
+		del_num = del_num + supprimer_rec(R->bro, del_num);
 
 	if (R->prev == NULL && R->bro == NULL) {  		// le nœud à supprimer est le seul de la liste
 		R->father->son = NULL;
@@ -332,7 +332,7 @@ int delete_r(node * R, int del_num) {
 
 //####################################################################################
 
-void insert_in_order(char * path) {
+void inserer(char * path) {
 
 	struct result * new, * curr, * prev;
 	int l;
@@ -361,28 +361,28 @@ void insert_in_order(char * path) {
 
 //####################################################################################
 
-void find(node * T, char * name, char * temp_path) {
+void trouver(node * T, char * name, char * temp_path) {
 	
-	char next_path[PATH_STRING_L];
+	char next_path[LON_NOM_CHEMIN];
 	
 	if (strcmp(T->name, name) == 0) {
 		//printf("ok %s\n", T->path);;
 		strcpy(next_path, temp_path);
 		strcat(next_path, "/");
 		strcat(next_path, name);
-		insert_in_order(next_path);
+		inserer(next_path);
 		return;
 	}
 	
 	if (T->bro != NULL) {
-		find(T->bro, name, temp_path);
+		trouver(T->bro, name, temp_path);
 	}
 
 	if (T->son != NULL) {
 		strcpy(next_path, temp_path);
 		strcat(next_path, "/");
 		strcat(next_path, T->name);
-		find(T->son, name, next_path);
+		trouver(T->son, name, next_path);
 	}
 	
 	return;
@@ -390,7 +390,7 @@ void find(node * T, char * name, char * temp_path) {
 
 //####################################################################################
 
-struct result * print_results_and_free(struct result * L) {
+struct result * afficher_liberer(struct result * L) {
 	// Le noeud ongi de la liste des résultats de la recherche contient le chemin complet de la ressource dans le champ 'n'
 	struct result * prev;
 
@@ -413,13 +413,13 @@ struct result * print_results_and_free(struct result * L) {
 
 int main(int argc, char * argv[]) {
 
-		char name[NAME_L];
-		char path[PATH_STRING_L];
-		char cmd[CMD_L];
-		char temp_path[PATH_STRING_L];
+		char name[LON_NOM];
+		char path[LON_NOM_CHEMIN];
+		char cmd[LON_CMD];
+		char temp_path[LON_NOM_CHEMIN];
 		int path_length = 0;
 		int found_num = 0;
-		char contenuto[DATA_L];
+		char contenu[LON_CONTENU];
 		int written_bytes;
 		int deleted_num = 0;
 		result ris;
@@ -427,7 +427,7 @@ int main(int argc, char * argv[]) {
 		
 		results = NULL;
 		
-		root = create_element(root, NULL, "", DIR_T);
+		root = creer_element(root, NULL, "", TYPE_REP);
 		if (root == NULL) {
 			return 0;
 		}
@@ -439,18 +439,18 @@ int main(int argc, char * argv[]) {
 
 				scanf("%s", path);
 				
-				if (strcmp("find", cmd) != 0) {
-					extract_name(path, name);
-					path_length = calc_path_length(path);
+				if (strcmp("trouver", cmd) != 0) {
+					extraire_nom(path, name);
+					path_length = calc_lon_chemin(path);
 
-					if (path_length > PATH_L || strcmp(path, "/") == 0 || path[0] != '/' || strcmp(name, "") == 0) {
+					if (path_length > LON_CHEMIN || strcmp(path, "/") == 0 || path[0] != '/' || strcmp(name, "") == 0) {
 						printf("no\n");
 					}
 
 					else {
 						
-						if (strcmp(cmd, "create") == 0) {
-							ris = create(name, path, path_length, FILE_T);
+						if (strcmp(cmd, "creer") == 0) {
+							ris = creer(name, path, path_length, TYPE_FICH);
 							if (ris == OK) {
 								printf("ok\n");                     // création de fichier réussie
 							}
@@ -458,8 +458,8 @@ int main(int argc, char * argv[]) {
 								printf("no\n");                     // échec de la création du fichier
 						}
 
-						else if (strcmp(cmd, "create_dir") == 0) {
-							ris = create(name, path, path_length, DIR_T);
+						else if (strcmp(cmd, "creer_rep") == 0) {
+							ris = creer(name, path, path_length, TYPE_REP);
 							if (ris == OK) {
 								printf("ok\n");                      // création de dossier réussie
 							}
@@ -467,20 +467,20 @@ int main(int argc, char * argv[]) {
 								printf("no\n");                      // échec de la création du dossier
 						}
 
-						else if (strcmp(cmd, "read") == 0) {
-							ris = read_file(path, name, contenuto);
+						else if (strcmp(cmd, "lire") == 0) {
+							ris = lire(path, name, contenu);
 							if (ris == OK) {
-								if (strlen(contenuto) == 0)
-									printf("contenuto \n");
+								if (strlen(contenu) == 0)
+									printf("contenu \n");
 								else
-									printf("contenuto %s\n", contenuto); // lecture de fichier réussie
+									printf("contenu %s\n", contenu); // lecture de fichier réussie
 							}
 							else
 								printf("no\n");                      // échec de la lecture du fichier
 						}
 
-						else if (strcmp(cmd, "write") == 0) {
-							//scanf("%s", contenuto);        // lit la chaîne à écrire dans le fichier, y compris les espaces, jusqu'au premier '\ n' (ENTER)
+						else if (strcmp(cmd, "ecrire") == 0) {
+							//scanf("%s", contenu);        // lit la chaîne à écrire dans le fichier, y compris les espaces, jusqu'au premier '\ n' (ENTER)
 
 															  // (pris comme caractères simples ---> ne mettez pas le '\ 0' seul)
 							int i = 0;
@@ -491,12 +491,12 @@ int main(int argc, char * argv[]) {
 							while (c != '\n') {
 								c = getchar();
 								if (c != '"') {
-									contenuto[i] = c;
+									contenu[i] = c;
 									i++;
 								}
 							}
-							contenuto[i] = '\0';
-							written_bytes = write_file(path, name, contenuto);
+							contenu[i] = '\0';
+							written_bytes = ecrire(path, name, contenu);
 							if (written_bytes != -1) {
 								printf("ok %d\n", written_bytes); // écriture de fichier réussie
 							}
@@ -504,8 +504,8 @@ int main(int argc, char * argv[]) {
 								printf("no\n");                   // échec d'écriture du fichier
 						}
 
-						else if (strcmp(cmd, "delete") == 0) {
-							ris = delete(path, name);
+						else if (strcmp(cmd, "supprimer") == 0) {
+							ris = supprimer(path, name);
 							if (ris == OK) {
 								printf("ok\n");                   // suppression de fichier réussie
 							}
@@ -513,14 +513,14 @@ int main(int argc, char * argv[]) {
 								printf("no\n");                   // échec de suppression de fichier
 						}
 
-						else if (strcmp(cmd, "delete_r") == 0) {
-							R = path_travel(path);
+						else if (strcmp(cmd, "supprimer_rec") == 0) {
+							R = positionner(path);
 							if (R == NULL)
 								printf("no\n");
 							else {
 								if (R->son != NULL)
-									deleted_num = delete_r(R->son, 0);
-								ris = delete(path, name);
+									deleted_num = supprimer_rec(R->son, 0);
+								ris = supprimer(path, name);
 								if (ris == OK)
 									printf("ok\n");                   // suppression su ressource réussie
 								else
@@ -530,14 +530,14 @@ int main(int argc, char * argv[]) {
 					}
 				}
 
-				else if (strcmp(cmd, "find") == 0) {
+				else if (strcmp(cmd, "trouver") == 0) {
 							strcpy(temp_path, "");
-							find(root, path, temp_path);     // chemin contient le nom des ressources à rechercher
+							trouver(root, path, temp_path);     // chemin contient le nom des ressources à rechercher
 
 							if (results == NULL)  				  // aucune ressource avec le nom recherché trouvée
 								printf("no\n");
 							else
-								results = print_results_and_free(results);				 
+								results = afficher_liberer(results);				 
 						}
 
 					}
