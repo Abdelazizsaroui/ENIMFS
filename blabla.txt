@@ -7,3 +7,5 @@ Commandes:
 - supprimer <chemin> : pour supprimer un fichier ou repertoire vide
 - supprimer_rec : suppression recursive pour supprimer un repertoire plein
 - trouver <nom du fichier ou rep> : pour trouver un fichier ou repertoire
+
+Le chemin doit commencer de la racine ( y3ni bdarija khasso ibda b slash / )
