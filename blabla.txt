@@ -1,0 +1,9 @@
+Commandes:
+
+- creer <chemin> : pour créer un fichier ( creer /fich ou creer /rep/fich )
+- creer_rep <chemin> : pour créer un répertoire ( creer_rep /rep )
+- ecrire <chemin au fichier> <contenu> : pour ecrire dans un fichier ( ecrire /rep/fich blabla bla)
+- lire <chemin au fichier> : pour lire le contenu d'un fichier
+- supprimer <chemin> : pour supprimer un fichier ou repertoire vide
+- supprimer_rec : suppression recursive pour supprimer un repertoire plein
+- trouver <nom du fichier ou rep> : pour trouver un fichier ou repertoire

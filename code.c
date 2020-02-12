@@ -415,7 +415,7 @@ int main(int argc, char * argv[]) {
 		int longueur_chemin = 0;
 		int nbr_trouve = 0;
 		char contenu[LON_CONTENU];
-		int octet_ecrit;
+		int nbr_caract_ecrit;
 		int nbr_supp = 0;
 		resultat res;
 		noeud * R;
@@ -514,12 +514,12 @@ int main(int argc, char * argv[]) {
 								}
 							}
 							contenu[i] = '\0';
-							octet_ecrit = ecrire(chemin, nom, contenu);
-							if (octet_ecrit != -1) {
+							nbr_caract_ecrit = ecrire(chemin, nom, contenu);
+							if (nbr_caract_ecrit != -1) {
 								printf("\033[1;32m");
 								printf("✓ ");
 								printf("\033[0m");
-								printf("Ecriture réussie: %d\n", octet_ecrit); 
+								printf("Ecriture réussie: %d caractères.\n", nbr_caract_ecrit); 
 							}
 							else {
 								printf("\033[1;31m");
